@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # MORTEM ☠️
 ### The Unnecessarily Serious Object Lifespan Predictor
 
@@ -178,3 +179,7 @@ $$\text{Estimated Lifespan} = \text{Base Lifespan} \times M_{\text{usage}} \time
 - **Extended Catalog**: Shampoo bottles, umbrellas, house plants, and earbuds.
 - **User Accounts & Memorials**: Digital graveyard for retired belongings.
 - **Mobile Companion App**: Barcode scanning for instant expiration countdowns.
+=======
+# Mortem
+THE UNNECESSARILY SERIOUS OBJECT LIFESPAN PREDICTOR
+>>>>>>> a8e1b57fedb1497659539d8809339979fa689370
