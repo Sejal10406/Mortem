@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}MORTEM: The Unnecessarily Serious Object Lifespan Predictor ☠️{% endblock %}</title>
+  <meta name="description" content="A dark forensic laboratory web application that dramatically predicts the remaining lifespan, survival probability, and inevitable cause of death of everyday objects.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Chakra+Petch:wght@400;500;600;700&family=Cinzel:wght@700;900&family=Homemade+Apple&family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Special+Elite&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+  <!-- Top Navigation Bar (Strict 3-zone Top Bar Contract) -->
+  <header class="top-nav">
+    <a href="{{ url_for('home') }}" class="brand-link">
+      <span class="brand-icon">☠</span>
+      <span>MORTEM</span>
+    </a>
+
+    <nav>
+      <ul class="nav-menu">
+        <li><a href="{{ url_for('home') }}" class="nav-link {% if request.endpoint == 'home' %}active{% endif %}">Home</a></li>
+        <li><a href="{{ url_for('home') }}#autopsy-section" class="nav-link">Predict</a></li>
+        <li><a href="{{ url_for('history') }}" class="nav-link {% if request.endpoint == 'history' %}active{% endif %}">History</a></li>
+        <li><a href="{{ url_for('about') }}" class="nav-link {% if request.endpoint == 'about' %}active{% endif %}">About</a></li>
+      </ul>
+    </nav>
+
+    <div>
+      <a href="{{ url_for('home') }}#autopsy-section" class="btn-primary">
+        <span>☠</span>
+        <span>Analyze Object</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="main-wrapper">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer style="border-top: 1px solid var(--border); padding: 2.5rem 1.5rem; text-align: center; color: var(--muted); font-size: 0.8125rem; font-family: var(--font-mono); margin-top: auto;">
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 0.75rem; align-items: center;">
+      <p style="color: #c4c4d4; font-size: 0.875rem;">MORTEM FORENSIC OBJECT DIVISION · PREDICTING THE INEVITABLE</p>
+      <p>Scientific? No. Dramatic? Absolutely. Because even your pencil deserves to know when it will die.</p>
+      <p style="color: #66667a;">&copy; 2026 MORTEM Research Facility. All rights reserved under the laws of entropy.</p>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

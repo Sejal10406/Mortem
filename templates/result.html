@@ -1,0 +1,601 @@
+{% extends "base.html" %}
+
+{% block title %}CASE FILE #{{ case.case_id }} · {% if case.life_status == 'DEAD' or case.status == 'DECEASED' %}DEATH CERTIFICATE{% else %}OBJECT HEALTH REPORT{% endif %}{% endblock %}
+
+{% block content %}
+<!-- Error Alert (shown if route protection redirects from unauthorized certificate access) -->
+{% if error_msg or request.args.get('error') %}
+<div style="background: rgba(217, 4, 41, 0.15); border: 1px solid var(--danger); color: #ff8598; padding: 1rem 1.25rem; border-radius: 8px; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+  <span style="font-size: 1.5rem;">🔒</span>
+  <div style="font-family: var(--font-mono); font-size: 0.9375rem; font-weight: 600;">
+    {{ error_msg or request.args.get('error') }}
+  </div>
+</div>
+{% endif %}
+
+<!-- Top Actions Bar -->
+<div class="no-print" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+  <a href="{{ url_for('home') }}" class="btn-secondary" style="font-size: 0.8125rem; padding: 0.5rem 1rem;">
+    &larr; Return to Intake
+  </a>
+  <div style="display: flex; gap: 0.75rem; align-items: center;">
+    <button onclick="window.print()" class="btn-secondary" style="font-size: 0.8125rem; padding: 0.5rem 1rem;">
+      🖨️ Print Report
+    </button>
+    
+    <!-- STRICT ACCESS CONTROL: Death Certificate ONLY accessible when life_status == 'DEAD' -->
+    {% if case.life_status == 'DEAD' or case.status == 'DECEASED' %}
+    <a href="{{ url_for('certificate', case_id=case.case_id) }}" class="btn-primary" style="font-size: 0.8125rem; padding: 0.5rem 1rem; background: #d90429; border-color: #ff2a4b;">
+      ☠ VIEW DEATH CERTIFICATE
+    </a>
+    {% else %}
+    <span class="btn-secondary" style="font-size: 0.8125rem; padding: 0.5rem 1rem; opacity: 0.55; cursor: not-allowed; border-color: rgba(255,255,255,0.12);" title="Death certificate unavailable while object is alive">
+      🔒 Certificate Locked (Alive)
+    </span>
+    {% endif %}
+  </div>
+</div>
+
+<article class="case-report" id="case-report-container">
+  
+  <!-- =========================================================================
+       REPORT HEADER: MORTEM + REPORT TYPE (HEALTH REPORT vs DEATH CERTIFICATE)
+       ========================================================================= -->
+  <div class="case-header-bar" style="border-bottom: 2px solid {% if case.life_status == 'DEAD' or case.status == 'DECEASED' %}#d90429{% else %}#10b981{% endif %};">
+    <div>
+      <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 0.25rem;">
+        MORTEM FEDERAL REGISTRY · {% if case.life_status == 'DEAD' or case.status == 'DECEASED' %}POST-MORTEM RECORD{% else %}CLINICAL SURVEILLANCE{% endif %}
+      </div>
+      <div style="font-family: var(--font-display); font-size: 1.85rem; font-weight: 900; letter-spacing: 0.05em; color: {% if case.life_status == 'DEAD' or case.status == 'DECEASED' %}#ff2a4b{% else %}#10b981{% endif %}; line-height: 1.1; margin-bottom: 0.35rem;">
+        {% if case.life_status == 'DEAD' or case.status == 'DECEASED' %}
+          DEATH CERTIFICATE
+        {% else %}
+          OBJECT HEALTH REPORT
+        {% endif %}
+      </div>
+      <div class="case-subject-wrap" style="margin-top: 0.25rem;">
+        <span class="subject-label" style="font-size: 0.75rem;">CASE ID:</span>
+        <span class="subject-name" style="font-family: var(--font-mono); font-weight: 800;">MRT-{{ case.case_id }}</span>
+        <span style="color: var(--muted); margin: 0 0.5rem;">·</span>
+        <span class="subject-label" style="font-size: 0.75rem;">OBJECT:</span>
+        <span class="subject-name">{{ case.object_name | upper }}</span>
+        <span style="font-size: 1.25rem;">{{ case.icon }}</span>
+      </div>
+    </div>
+    
+    <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem;">
+      <!-- Large Status Indicator -->
+      <div class="status-badge-lg {% if case.life_status == 'DEAD' or case.status == 'DECEASED' %}terminal{% else %}{{ case.risk | lower | replace(' ', '-') }}{% endif %}">
+        {% if case.life_status == 'DEAD' or case.status == 'DECEASED' %}
+          ☠ DECEASED
+        {% else %}
+          ● ALIVE
+        {% endif %}
+      </div>
+      <div class="case-timestamp">LOGGED: {{ case.timestamp }}</div>
+    </div>
+  </div>
+
+  <!-- Primary Case Parameters Strip -->
+  <div style="background: #0d0d12; border-bottom: 1px solid var(--border); padding: 1.25rem 2.5rem;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem;">
+      
+      <!-- 1. Life Status -->
+      <div style="background: #141419; border: 1px solid var(--border); border-radius: 6px; padding: 0.875rem 1rem;">
+        <div style="font-family: var(--font-mono); font-size: 0.6875rem; color: var(--muted); text-transform: uppercase; margin-bottom: 0.25rem;">
+          LIFE STATUS
+        </div>
+        <div id="stat-current-state" style="font-family: var(--font-mono); font-size: 1.15rem; font-weight: 800; color: {% if case.life_status == 'DEAD' or case.status == 'DECEASED' %}#ff2a4b{% else %}#10b981{% endif %};">
+          {% if case.life_status == 'DEAD' or case.status == 'DECEASED' %}☠ DEAD{% else %}● ALIVE{% endif %}
+        </div>
+      </div>
+
+      <!-- 2. Active Report -->
+      <div style="background: #141419; border: 1px solid var(--border); border-radius: 6px; padding: 0.875rem 1rem;">
+        <div style="font-family: var(--font-mono); font-size: 0.6875rem; color: var(--muted); text-transform: uppercase; margin-bottom: 0.25rem;">
+          ACTIVE REPORT
+        </div>
+        <div style="font-family: var(--font-mono); font-size: 0.875rem; font-weight: 700; color: #fff; margin-top: 0.2rem;">
+          {% if case.life_status == 'DEAD' or case.status == 'DECEASED' %}DEATH CERTIFICATE{% else %}HEALTH REPORT{% endif %}
+        </div>
+      </div>
+
+      <!-- 3. Health Score / Condition -->
+      <div style="background: #141419; border: 1px solid var(--border); border-radius: 6px; padding: 0.875rem 1rem;">
+        <div style="font-family: var(--font-mono); font-size: 0.6875rem; color: var(--muted); text-transform: uppercase; margin-bottom: 0.25rem;">
+          HEALTH SCORE
+        </div>
+        <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 800; color: #fff;">
+          {{ case.health_score|default(case.condition) }}%
+        </div>
+      </div>
+
+      <!-- 4. Survival Probability -->
+      <div style="background: #141419; border: 1px solid var(--border); border-radius: 6px; padding: 0.875rem 1rem;">
+        <div style="font-family: var(--font-mono); font-size: 0.6875rem; color: var(--muted); text-transform: uppercase; margin-bottom: 0.25rem;">
+          {% if case.life_status == 'DEAD' or case.status == 'DECEASED' %}FINAL SURVIVAL{% else %}SURVIVAL PROBABILITY{% endif %}
+        </div>
+        <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 800; color: {% if case.life_status == 'DEAD' or case.status == 'DECEASED' %}#ff2a4b{% elif case.risk == 'SAFE' %}#10b981{% elif case.risk == 'AT RISK' %}#f59e0b{% elif case.risk == 'CRITICAL' %}#f97316{% else %}#d90429{% endif %};">
+          {% if case.life_status == 'DEAD' or case.status == 'DECEASED' %}0%{% else %}{{ case.survival_probability }}%{% endif %}
+        </div>
+      </div>
+
+      <!-- 5. Remaining Life -->
+      <div style="background: #141419; border: 1px solid var(--border); border-radius: 6px; padding: 0.875rem 1rem;">
+        <div style="font-family: var(--font-mono); font-size: 0.6875rem; color: var(--muted); text-transform: uppercase; margin-bottom: 0.25rem;">
+          REMAINING LIFE
+        </div>
+        <div id="stat-remaining-life" style="font-family: var(--font-mono); font-size: 1rem; font-weight: 800; color: {% if case.life_status == 'DEAD' or case.status == 'DECEASED' %}#ff2a4b{% else %}#fff{% endif %}; truncate;">
+          {% if case.life_status == 'DEAD' or case.status == 'DECEASED' %}
+            00:00 (EXPIRED)
+          {% else %}
+            {{ case.remaining_formatted }}
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- 6. Risk Level / Final Classification -->
+      <div style="background: #141419; border: 1px solid var(--border); border-radius: 6px; padding: 0.875rem 1rem;">
+        <div style="font-family: var(--font-mono); font-size: 0.6875rem; color: var(--muted); text-transform: uppercase; margin-bottom: 0.25rem;">
+          {% if case.life_status == 'DEAD' or case.status == 'DECEASED' %}FINAL RISK LEVEL{% else %}RISK LEVEL{% endif %}
+        </div>
+        <div style="font-family: var(--font-mono); font-size: 1.15rem; font-weight: 800; color: {% if case.life_status == 'DEAD' or case.status == 'DECEASED' %}#ff2a4b{% elif case.risk == 'SAFE' %}#10b981{% elif case.risk == 'AT RISK' %}#f59e0b{% elif case.risk == 'CRITICAL' %}#f97316{% else %}#d90429{% endif %};">
+          {% if case.life_status == 'DEAD' or case.status == 'DECEASED' %}DECEASED{% else %}{{ case.risk }}{% endif %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="case-body">
+    <!-- Left Column: Report Contents -->
+    <div>
+
+      <!-- =====================================================================
+           DEMO MODE LIVE COUNTDOWN BANNER (when demo_mode is active and object alive)
+           ===================================================================== -->
+      {% if case.demo_mode and (case.life_status != 'DEAD' and case.status != 'DECEASED') %}
+      <div id="demo-countdown-panel" style="background: rgba(217, 4, 41, 0.12); border: 2px solid #d90429; border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; text-align: center; box-shadow: 0 0 30px rgba(217, 4, 41, 0.25);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <span style="font-family: var(--font-mono); font-size: 0.75rem; color: #ff8598; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;">
+            ⚡ DEMO MODE ACTIVE · LIVE COUNTDOWN
+          </span>
+          <span style="font-family: var(--font-mono); font-size: 0.6875rem; color: #ff8598; background: rgba(217, 4, 41, 0.25); padding: 0.2rem 0.6rem; border-radius: 4px; border: 1px solid rgba(217, 4, 41, 0.4);">
+            HACKATHON PROTOCOL
+          </span>
+        </div>
+        
+        <div style="font-family: var(--font-mono); font-size: 0.8125rem; color: #e4e4ed; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 0.25rem;">
+          LIVE TIME REMAINING
+        </div>
+        
+        <div id="countdown-display" style="font-family: var(--font-mono); font-size: 3.5rem; font-weight: 900; color: #ff2a4b; letter-spacing: 0.05em; text-shadow: 0 0 20px rgba(255, 42, 75, 0.6); margin-bottom: 0.75rem; line-height: 1;">
+          00:30
+        </div>
+
+        <div style="font-size: 0.8125rem; color: #a1a1aa; margin-bottom: 1rem;">
+          While countdown runs: <strong>LIFE STATUS: ● ALIVE</strong>, <strong>REPORT: OBJECT HEALTH REPORT</strong>, <strong>CERTIFICATE: 🔒 LOCKED</strong>.
+          When it reaches 00:00, the death event transitions the object to <strong>DEAD</strong> and unlocks the Death Certificate.
+        </div>
+
+        <!-- Accelerate Time Button for quick Hackathon evaluation -->
+        <button id="fast-forward-btn" onclick="triggerFastForwardDeath()" type="button" class="btn-secondary" style="font-size: 0.8125rem; padding: 0.5rem 1rem; border-color: rgba(217, 4, 41, 0.6); color: #ff8598; cursor: pointer;">
+          ⚡ FAST FORWARD TIME (COUNTDOWN TO 00:02)
+        </button>
+      </div>
+      {% endif %}
+
+      <!-- =====================================================================
+           REPORT 1: OBJECT IS ALIVE -> OBJECT HEALTH REPORT (Section 2)
+           ===================================================================== -->
+      {% if case.life_status != 'DEAD' and case.status != 'DECEASED' %}
+      <div id="health-report-section" style="space-y: 1.5rem;">
+        
+        <!-- Health Report Banner -->
+        <div style="background: rgba(16, 185, 129, 0.1); border: 2px solid #10b981; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <div style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; color: #10b981; letter-spacing: 0.05em;">
+              MORTEM · OBJECT HEALTH REPORT
+            </div>
+            <div style="font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; color: #10b981; background: rgba(16, 185, 129, 0.2); padding: 0.3rem 0.75rem; border-radius: 4px;">
+              STATUS: ● ALIVE
+            </div>
+          </div>
+          <p style="font-size: 1rem; color: #d1fae5; margin: 0;">
+            "The object is currently functional and alive. Remaining lifespan is actively monitored."
+          </p>
+        </div>
+
+        <!-- Key-Value Clinical Dossier Table (matching Section 2 Example) -->
+        <div style="background: #0f0f15; border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
+          <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; font-weight: 700;">
+            CLINICAL SPECIMEN TELEMETRY
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr; gap: 0.75rem; font-family: var(--font-mono); font-size: 0.875rem;">
+            
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.08); padding-bottom: 0.4rem;">
+              <span style="color: var(--muted);">Case ID:</span>
+              <span style="color: #fff; font-weight: 700;">MRT-{{ case.case_id }}</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.08); padding-bottom: 0.4rem;">
+              <span style="color: var(--muted);">Object:</span>
+              <span style="color: #fff; font-weight: 700;">{{ case.object_name }} {{ case.icon }}</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.08); padding-bottom: 0.4rem;">
+              <span style="color: var(--muted);">Current Status:</span>
+              <span style="color: #10b981; font-weight: 800;">● ALIVE</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.08); padding-bottom: 0.4rem;">
+              <span style="color: var(--muted);">Health Score:</span>
+              <span style="color: #fff; font-weight: 700;">{{ case.health_score|default(case.condition) }}%</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.08); padding-bottom: 0.4rem;">
+              <span style="color: var(--muted);">Survival Probability:</span>
+              <span style="color: {% if case.risk == 'SAFE' %}#10b981{% elif case.risk == 'AT RISK' %}#f59e0b{% elif case.risk == 'CRITICAL' %}#f97316{% else %}#d90429{% endif %}; font-weight: 700;">
+                {{ case.survival_probability }}%
+              </span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.08); padding-bottom: 0.4rem;">
+              <span style="color: var(--muted);">Estimated Remaining Life:</span>
+              <span style="color: #fff; font-weight: 700;">{{ case.remaining_formatted }}</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.08); padding-bottom: 0.4rem;">
+              <span style="color: var(--muted);">Risk Level:</span>
+              <span style="color: {% if case.risk == 'SAFE' %}#10b981{% elif case.risk == 'AT RISK' %}#f59e0b{% elif case.risk == 'CRITICAL' %}#f97316{% else %}#d90429{% endif %}; font-weight: 800;">
+                {{ case.risk }}
+              </span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.08); padding-bottom: 0.4rem;">
+              <span style="color: var(--muted);">Condition:</span>
+              <span style="color: #fff; font-weight: 700;">{{ case.condition }}%</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.08); padding-bottom: 0.4rem;">
+              <span style="color: var(--muted);">Usage:</span>
+              <span style="color: #fff; font-weight: 700;">{{ case.usage }}</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.08); padding-bottom: 0.4rem;">
+              <span style="color: var(--muted);">Care:</span>
+              <span style="color: #fff; font-weight: 700;">{{ case.care }}</span>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.35rem; padding-top: 0.4rem;">
+              <span style="color: var(--muted);">Predicted Cause of Death:</span>
+              <span style="color: #fff; font-style: italic; font-size: 0.9375rem; line-height: 1.4;">
+                "{{ case.cause_of_death }}"
+              </span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Risk Classification Directive Box (SAFE / AT RISK / CRITICAL / TERMINAL) -->
+        <div style="background: #141419; border-left: 4px solid {% if case.risk == 'SAFE' %}#10b981{% elif case.risk == 'AT RISK' %}#f59e0b{% elif case.risk == 'CRITICAL' %}#f97316{% else %}#d90429{% endif %}; border-radius: 0 6px 6px 0; padding: 1.25rem; margin-bottom: 1.5rem;">
+          <div style="font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: {% if case.risk == 'SAFE' %}#10b981{% elif case.risk == 'AT RISK' %}#f59e0b{% elif case.risk == 'CRITICAL' %}#f97316{% else %}#d90429{% endif %}; margin-bottom: 0.25rem;">
+            RISK ASSESSMENT DIRECTIVE · {{ case.risk }}
+          </div>
+          <div style="font-size: 0.9375rem; color: #e4e4ed;">
+            "{{ case.recommended_action|default('Continue monitoring object telemetry.') }}"
+          </div>
+        </div>
+
+        <!-- SECTION 2 MANDATORY BOTTOM BANNER: OBJECT IS STILL ALIVE / DEATH CERTIFICATE LOCKED -->
+        <div style="background: #141419; border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; text-align: center; margin-bottom: 1.5rem;">
+          <div style="font-family: var(--font-mono); font-size: 1.125rem; font-weight: 800; color: #10b981; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+            <span>🟢</span>
+            <span>OBJECT IS STILL ALIVE</span>
+          </div>
+
+          <div style="font-family: var(--font-mono); font-size: 0.8125rem; color: #f59e0b; font-weight: 700; margin-bottom: 0.5rem;">
+            Death Certificate: 🔒 NOT AVAILABLE
+          </div>
+
+          <p style="font-size: 0.875rem; color: #a1a1aa; max-width: 520px; margin: 0 auto 1.25rem auto; line-height: 1.5;">
+            "The object must reach the end of its predicted lifespan before a death certificate can be issued."
+          </p>
+
+          <!-- Interaction buttons based on risk level + Print Report -->
+          <div style="display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap;">
+            {% if case.risk == 'SAFE' %}
+            <a href="{{ url_for('home') }}" class="btn-primary" style="background: #10b981; border-color: #059669; padding: 0.75rem 1.5rem; font-size: 0.875rem;">
+              ✓ KEEP USING
+            </a>
+            {% elif case.risk == 'AT RISK' %}
+            <a href="{{ url_for('home') }}" class="btn-primary" style="background: #f59e0b; border-color: #d97706; padding: 0.75rem 1.5rem; font-size: 0.875rem;">
+              ⚠️ MONITOR OBJECT
+            </a>
+            {% else %}
+            <a href="{{ url_for('home') }}" class="btn-secondary" style="padding: 0.75rem 1.5rem; font-size: 0.875rem;">
+              ⚠️ PROCEED WITH ACTIVE SURVEILLANCE
+            </a>
+            {% endif %}
+            
+            <button type="button" onclick="window.print()" class="btn-secondary" style="padding: 0.75rem 1.5rem; font-size: 0.875rem; display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; border-color: rgba(255,255,255,0.25);">
+              <span>🖨️</span>
+              <span>Print Health Report</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+      {% endif %}
+
+      <!-- =====================================================================
+           REPORT 2: OBJECT IS DEAD -> DEATH CERTIFICATE (Section 3 & 8)
+           ===================================================================== -->
+      {% if case.life_status == 'DEAD' or case.status == 'DECEASED' %}
+      <div id="deceased-report-section" style="space-y: 1.5rem;">
+        
+        <!-- Primary Deceased Banner -->
+        <div style="background: rgba(217, 4, 41, 0.2); border: 2px solid #d90429; border-radius: 8px; padding: 1.75rem; margin-bottom: 1.5rem; box-shadow: 0 0 35px rgba(217, 4, 41, 0.35);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+            <div style="font-family: var(--font-display); font-size: 1.85rem; font-weight: 900; color: #ff2a4b; letter-spacing: 0.05em;">
+              MORTEM · DEATH CERTIFICATE
+            </div>
+            <div style="font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; color: #fff; background: #d90429; padding: 0.35rem 0.875rem; border-radius: 4px; text-transform: uppercase;">
+              STATUS: ☠ DECEASED
+            </div>
+          </div>
+          <p style="font-size: 1.05rem; color: #ffe4e6; font-weight: 500; margin: 0;">
+            "The object's predicted lifespan has reached zero. Official cessation of utility declared."
+          </p>
+        </div>
+
+        <!-- Official Death Certificate Specification Table (matching Section 3 Example) -->
+        <div style="background: #0f0f15; border: 1px solid rgba(217, 4, 41, 0.4); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
+          <div style="font-family: var(--font-mono); font-size: 0.75rem; color: #ff8598; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem; border-bottom: 1px solid rgba(217, 4, 41, 0.3); padding-bottom: 0.5rem; font-weight: 700;">
+            OFFICIAL CORONER DOSSIER SPECIFICATIONS
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr; gap: 0.75rem; font-family: var(--font-mono); font-size: 0.875rem;">
+            
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.08); padding-bottom: 0.4rem;">
+              <span style="color: var(--muted);">Case ID:</span>
+              <span style="color: #fff; font-weight: 700;">MRT-{{ case.case_id }}</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.08); padding-bottom: 0.4rem;">
+              <span style="color: var(--muted);">Object:</span>
+              <span style="color: #fff; font-weight: 700;">{{ case.object_name }} {{ case.icon }}</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.08); padding-bottom: 0.4rem;">
+              <span style="color: var(--muted);">Status:</span>
+              <span style="color: #ff2a4b; font-weight: 800;">☠ DECEASED</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.08); padding-bottom: 0.4rem;">
+              <span style="color: var(--muted);">Date of Death:</span>
+              <span style="color: #fff; font-weight: 700;">{{ case.date_of_death|default(case.date_of_prediction) }}</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.08); padding-bottom: 0.4rem;">
+              <span style="color: var(--muted);">Time of Death:</span>
+              <span style="color: #fff; font-weight: 700;">{{ case.time_of_death|default('11:47 AM') }}</span>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.35rem; border-bottom: 1px dashed rgba(255,255,255,0.08); padding-bottom: 0.4rem;">
+              <span style="color: var(--muted);">Cause of Death:</span>
+              <span style="color: #fff; font-style: italic; font-size: 0.9375rem; line-height: 1.4;">
+                "{{ case.cause_of_death }}"
+              </span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.08); padding-bottom: 0.4rem;">
+              <span style="color: var(--muted);">Final Survival Probability:</span>
+              <span style="color: #ff2a4b; font-weight: 800;">0%</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.08); padding-bottom: 0.4rem;">
+              <span style="color: var(--muted);">Final Risk Level:</span>
+              <span style="color: #ff2a4b; font-weight: 800;">DECEASED</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.08); padding-bottom: 0.4rem;">
+              <span style="color: var(--muted);">Usage:</span>
+              <span style="color: #fff; font-weight: 700;">{{ case.usage }}</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.08); padding-bottom: 0.4rem;">
+              <span style="color: var(--muted);">Condition:</span>
+              <span style="color: #fff; font-weight: 700;">{{ case.condition }}%</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--muted);">Care:</span>
+              <span style="color: #fff; font-weight: 700;">{{ case.care }}</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- OFFICIALLY DECLARED CALLOUT (Section 3) -->
+        <div style="background: rgba(217, 4, 41, 0.12); border: 2px dashed #d90429; border-radius: 8px; padding: 1.5rem; text-align: center; margin-bottom: 1.5rem;">
+          <div style="font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.25em; color: var(--muted); font-weight: 700; margin-bottom: 0.25rem;">
+            OFFICIALLY DECLARED
+          </div>
+          <div style="font-family: var(--font-display); font-size: 2rem; font-weight: 900; color: #ff2a4b; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 0.5rem;">
+            "UNNECESSARILY DECEASED"
+          </div>
+          <div style="font-family: var(--font-mono); font-size: 0.8125rem; color: #a1a1aa;">
+            Under MORTEM Codex · All functional capabilities permanently terminated.
+          </div>
+        </div>
+
+        <!-- VIEW DEATH CERTIFICATE & PRINT ACTIONS (Section 8) -->
+        <div style="margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem;">
+          <a href="{{ url_for('certificate', case_id=case.case_id) }}" class="btn-primary" style="background: #d90429; border-color: #ff2a4b; width: 100%; justify-content: center; padding: 1.15rem; font-size: 1.15rem; box-shadow: 0 4px 25px rgba(217, 4, 41, 0.45);">
+            <span>☠</span>
+            <span>VIEW DEATH CERTIFICATE</span>
+          </a>
+          <button type="button" onclick="window.print()" class="btn-secondary" style="width: 100%; justify-content: center; padding: 0.85rem; font-size: 0.9375rem; display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+            <span>🖨️</span>
+            <span>Print Deceased Case File</span>
+          </button>
+        </div>
+
+        <!-- Collapsible Historical Health Report (Section 8: "The Health Report can remain available as historical information") -->
+        <details style="background: #0f0f15; border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1.5rem;">
+          <summary style="font-family: var(--font-mono); font-size: 0.8125rem; color: #10b981; font-weight: 700; cursor: pointer; user-select: none;">
+            📁 View Historical Health Report (Pre-Mortem Data)
+          </summary>
+          <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--border); font-family: var(--font-mono); font-size: 0.8125rem; color: #a1a1aa; line-height: 1.6;">
+            <div>Original Baseline Risk: <strong style="color: #fff;">{{ case.risk }}</strong></div>
+            <div>Original Health Score: <strong style="color: #fff;">{{ case.health_score|default(case.condition) }}%</strong></div>
+            <div>Historical Survival Probability: <strong style="color: #fff;">{{ case.survival_probability }}%</strong></div>
+            <div>Report Generated: <strong style="color: #fff;">{{ case.timestamp }}</strong></div>
+            <div style="margin-top: 0.5rem; font-style: italic;">
+              "Historical baseline recorded prior to zero-lifespan mortality threshold."
+            </div>
+          </div>
+        </details>
+
+      </div>
+      {% endif %}
+
+      <!-- Sworn Affidavit / Notes Section -->
+      {% if case.notes %}
+      <div style="background: #0f0f15; border: 1px dashed var(--border); border-radius: 6px; padding: 1rem 1.25rem; margin-top: 1.5rem;">
+        <div style="font-family: var(--font-mono); font-size: 0.6875rem; color: var(--muted); text-transform: uppercase; margin-bottom: 0.25rem;">
+          SWORN OWNER AFFIDAVIT
+        </div>
+        <p style="font-size: 0.875rem; color: #a1a1aa; font-style: italic; margin: 0;">
+          "{{ case.notes }}"
+        </p>
+      </div>
+      {% endif %}
+
+    </div>
+
+    <!-- Right Column: Visual Telemetry Gauge & Diagnostics -->
+    <div>
+      
+      <!-- Visual Survival Gauge -->
+      <div class="gauge-card" style="margin-bottom: 1.5rem;">
+        <div class="gauge-wrap" style="position: relative; width: 140px; height: 140px; margin: 0 auto 1rem auto;">
+          <svg style="width: 100%; height: 100%; transform: rotate(-90deg);" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="40" stroke="#1f1f2b" stroke-width="8" fill="transparent" />
+            <circle id="animated-gauge" cx="50" cy="50" r="40" 
+                    stroke="{% if case.life_status == 'DEAD' or case.status == 'DECEASED' %}#ff2a4b{% elif case.risk == 'SAFE' %}#10b981{% elif case.risk == 'AT RISK' %}#f59e0b{% elif case.risk == 'CRITICAL' %}#f97316{% else %}#d90429{% endif %}" 
+                    stroke-width="8" 
+                    fill="transparent" 
+                    stroke-dasharray="251.2" 
+                    stroke-dashoffset="{% if case.life_status == 'DEAD' or case.status == 'DECEASED' %}251.2{% else %}{{ 251.2 - (251.2 * case.survival_probability) / 100 }}{% endif %}" 
+                    stroke-linecap="round" 
+                    style="transition: stroke-dashoffset 1.5s ease-out;" />
+          </svg>
+          <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <span id="gauge-val" style="font-family: var(--font-mono); font-size: 1.75rem; font-weight: 900; color: #fff;">
+              {% if case.life_status == 'DEAD' or case.status == 'DECEASED' %}0%{% else %}{{ case.survival_probability }}%{% endif %}
+            </span>
+            <span style="font-family: var(--font-mono); font-size: 0.625rem; color: var(--muted); text-transform: uppercase;">SURVIVAL</span>
+          </div>
+        </div>
+
+        <div style="font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 700; color: {% if case.life_status == 'DEAD' or case.status == 'DECEASED' %}#ff2a4b{% elif case.risk == 'SAFE' %}#10b981{% elif case.risk == 'AT RISK' %}#f59e0b{% elif case.risk == 'CRITICAL' %}#f97316{% else %}#d90429{% endif %}; text-transform: uppercase; letter-spacing: 0.05em; text-align: center; margin-bottom: 0.25rem;">
+          {% if case.life_status == 'DEAD' or case.status == 'DECEASED' %}
+            OBJECT DECEASED
+          {% else %}
+            {{ case.risk }} CLASSIFICATION
+          {% endif %}
+        </div>
+        <div style="font-size: 0.75rem; color: var(--muted); text-align: center;">
+          {% if case.life_status == 'DEAD' or case.status == 'DECEASED' %}
+            Zero remaining operational vitality.
+          {% else %}
+            Estimated lifespan remaining: {{ case.remaining_formatted }}
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Specimen Details Card -->
+      <div style="background: #141419; border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem;">
+        <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem; font-weight: 700;">
+          SUBJECT PROFILE
+        </div>
+        
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+          <span style="font-size: 2.25rem;">{{ case.icon }}</span>
+          <div>
+            <div style="font-family: var(--font-display); font-size: 1.125rem; font-weight: 700; color: #fff;">
+              {{ case.object_name }}
+            </div>
+            <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted);">
+              Registered Category: {{ case.object_key | upper }}
+            </div>
+          </div>
+        </div>
+
+        <div style="font-family: var(--font-mono); font-size: 0.75rem; color: #a1a1aa; space-y: 0.5rem; line-height: 1.5;">
+          <div>Usage Intensity: <strong style="color: #fff;">{{ case.usage }}</strong></div>
+          <div>Condition: <strong style="color: #fff;">{{ case.condition }}%</strong></div>
+          <div>Owner Stewardship: <strong style="color: #fff;">{{ case.care }}</strong></div>
+        </div>
+      </div>
+
+      <!-- Action Button at Bottom of Column -->
+      <div>
+        {% if case.life_status == 'DEAD' or case.status == 'DECEASED' %}
+        <a href="{{ url_for('certificate', case_id=case.case_id) }}" class="btn-primary" style="background: #d90429; border-color: #ff2a4b; width: 100%; justify-content: center; padding: 0.875rem;">
+          ☠ VIEW DEATH CERTIFICATE
+        </a>
+        {% else %}
+        <div style="background: #141419; border: 1px solid var(--border); border-radius: 6px; padding: 0.875rem; text-align: center; font-family: var(--font-mono); font-size: 0.75rem; color: #71717a;">
+          🔒 Death Certificate Locked<br>
+          <span style="font-size: 0.6875rem; color: var(--muted);">Available only after lifespan reaches 00:00</span>
+        </div>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+</article>
+
+<!-- Fullscreen Death Transition Animation Sequence (Section 6) -->
+<div id="death-event-modal" style="display: none; position: fixed; inset: 0; background: rgba(5, 5, 8, 0.95); z-index: 99999; backdrop-filter: blur(12px); flex-direction: column; align-items: center; justify-content: center; padding: 2rem;">
+  <div style="max-width: 520px; width: 100%; text-align: center;">
+    <div style="font-size: 3.5rem; margin-bottom: 1rem; animation: pulse 1s infinite;">
+      ☠️
+    </div>
+    
+    <div style="font-family: var(--font-mono); font-size: 0.8125rem; color: #ff8598; text-transform: uppercase; letter-spacing: 0.2em; margin-bottom: 0.5rem;">
+      MORTEM FORENSIC CESSATION ENGINE
+    </div>
+
+    <div id="death-modal-step-text" style="font-family: var(--font-display); font-size: 1.75rem; font-weight: 900; color: #fff; letter-spacing: 0.05em; min-height: 2.5rem; margin-bottom: 1.5rem;">
+      LIFESPAN EXPIRED...
+    </div>
+
+    <!-- Progress indicator -->
+    <div style="background: rgba(255, 255, 255, 0.1); border-radius: 9999px; height: 6px; overflow: hidden; margin-bottom: 1.5rem;">
+      <div id="death-progress-bar" style="background: #d90429; height: 100%; width: 20%; transition: width 0.4s ease;"></div>
+    </div>
+
+    <div style="font-family: var(--font-mono); font-size: 0.75rem; color: #71717a;">
+      FORENSIC PROTOCOL MRT-§900 · DECLARING OBJECT DECEASED
+    </div>
+  </div>
+</div>
+
+<script>
+  window.CASE_DATA = {
+    case_id: "{{ case.case_id }}",
+    life_status: "{{ case.life_status|default('ALIVE') }}",
+    status: "{{ case.status }}",
+    is_deceased: {{ 'true' if (case.life_status == 'DEAD' or case.status == 'DECEASED' or case.is_deceased) else 'false' }},
+    demo_mode: {{ 'true' if case.demo_mode else 'false' }},
+    demo_duration_seconds: {{ case.demo_duration_seconds|default(30) }},
+    death_timestamp_epoch: {{ case.death_timestamp_epoch|default(0) }},
+    declare_death_url: "{{ url_for('api_declare_death', case_id=case.case_id) }}"
+  };
+</script>
+{% endblock %}

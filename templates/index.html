@@ -1,0 +1,305 @@
+{% extends "base.html" %}
+
+{% block title %}MORTEM ☠️ The Unnecessarily Serious Object Lifespan Predictor{% endblock %}
+
+{% block content %}
+<!-- 1. ADVANCED DASHBOARD HERO SECTION -->
+<section class="hero-card">
+  <div class="hero-content">
+    <div class="hero-badge">Official Object Forensic Bureau</div>
+    <h1 class="hero-title" style="letter-spacing: 0.02em;">MORTEM ☠️</h1>
+    <div style="font-family: var(--font-display); font-size: 1.125rem; font-weight: 700; color: #d90429; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem;">
+      THE UNNECESSARILY SERIOUS OBJECT LIFESPAN PREDICTOR
+    </div>
+    <p class="hero-subtitle">
+      Every object has a lifespan. Most people simply don't care enough to calculate it.
+    </p>
+    <div class="hero-tagline">
+      "Because even your pencil deserves to know when it will die."
+    </div>
+    <div style="margin-top: 1.75rem;">
+      <a href="#autopsy-section" class="btn-analyze-large">
+        <span>☠</span>
+        <span>ANALYZE NEW OBJECT</span>
+      </a>
+    </div>
+  </div>
+  <div class="hero-image-wrap">
+    <img src="{{ url_for('static', filename='images/hero.jpg') }}" alt="MORTEM Forensic Autopsy Chamber" class="hero-image">
+    <div class="hero-scanline"></div>
+  </div>
+</section>
+
+<!-- DYNAMIC TELEMETRY STATS DASHBOARD (Calculated dynamically from predictions.json) -->
+<section class="stats-grid">
+  <div class="stat-box">
+    <div class="stat-label">Total Objects Analyzed</div>
+    <div class="stat-value">{{ stats.total_analyzed }}</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-label">Safe Objects</div>
+    <div class="stat-value safe">{{ stats.safe_objects }}</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-label">At Risk Objects</div>
+    <div class="stat-value warning">{{ stats.at_risk_objects }}</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-label">Critical Cases</div>
+    <div class="stat-value critical">{{ stats.critical_cases }}</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-label">Terminal Cases</div>
+    <div class="stat-value danger">{{ stats.terminal_cases }}</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-label">Average Survival</div>
+    <div class="stat-value">{{ stats.average_survival }}%</div>
+  </div>
+</section>
+
+<!-- 2. LIVE OBJECT ANALYSIS INTAKE FORM -->
+<section id="autopsy-section" class="form-section">
+  <div class="section-header">
+    <div>
+      <h2 class="section-title">OBJECT AUTOPSY</h2>
+      <p class="section-desc">Provide the evidence. We will provide the inevitable.</p>
+    </div>
+    <div class="protocol-tag">PROTOCOL REF: MORTEM-ENG-2026</div>
+  </div>
+
+  <form id="autopsy-form" method="POST" action="{{ url_for('predict') }}">
+    <div class="autopsy-form">
+      <!-- 1. Object Type -->
+      <div class="field-group">
+        <label class="field-label" for="object-type-select">
+          <span>1. Object Type</span>
+          <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted);">REQUIRED</span>
+        </label>
+        <div class="select-wrapper">
+          <select id="object-type-select" name="object_type" class="form-control" required>
+            <option value="pencil">✏️ Pencil</option>
+            <option value="eraser">🧽 Eraser</option>
+            <option value="charger">🔌 Charger Cable</option>
+            <option value="mug">☕ Coffee Mug</option>
+            <option value="sock">🧦 Favorite Sock</option>
+            <option value="shoes">👟 Everyday Sneakers</option>
+            <option value="earphones">🎧 Earphones</option>
+            <option value="toothbrush">🪥 Toothbrush</option>
+            <option value="phone_screen">📱 Phone Screen</option>
+            <option value="chair">🪑 Desk Chair</option>
+            <option value="water_bottle">🧊 Water Bottle</option>
+            <option value="backpack">🎒 Backpack</option>
+            <option value="custom">☠️ Custom Subject...</option>
+          </select>
+        </div>
+
+        <!-- Custom Object Name Input (Initially Hidden) -->
+        <div id="custom-object-group" style="display: none; margin-top: 0.5rem;">
+          <input type="text" name="custom_name" class="form-control" placeholder="Specify custom object name (e.g. Wireless Mouse, Umbrella)">
+        </div>
+
+        <!-- Live Visual Baseline Badge -->
+        <div class="object-preview-badge">
+          <div id="preview-icon" class="object-preview-icon">✏️</div>
+          <div class="object-preview-details">
+            <div id="preview-name" class="object-preview-name">Pencil</div>
+            <div id="preview-baseline" class="object-preview-baseline">Baseline Lifespan: 30 Days</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Usage Level -->
+      <div class="field-group">
+        <label class="field-label">
+          <span>2. Usage Level</span>
+          <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted);">FREQUENCY</span>
+        </label>
+        <div class="segmented-grid">
+          <label class="segmented-label">
+            <input type="radio" name="usage" value="Light">
+            <span class="segmented-text">Light</span>
+          </label>
+          <label class="segmented-label active">
+            <input type="radio" name="usage" value="Moderate" checked>
+            <span class="segmented-text">Moderate</span>
+          </label>
+          <label class="segmented-label">
+            <input type="radio" name="usage" value="Heavy">
+            <span class="segmented-text">Heavy</span>
+          </label>
+          <label class="segmented-label">
+            <input type="radio" name="usage" value="Extreme">
+            <span class="segmented-text">Extreme</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- 3. Physical Condition Slider with Unicode Block Progress Bar -->
+      <div class="field-group form-full-width">
+        <label class="field-label" for="condition-slider">
+          <span>3. Physical Condition</span>
+          <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted);">SURFACE & STRUCTURAL INTEGRITY</span>
+        </label>
+        <div class="slider-container">
+          <div class="slider-readout">
+            <span id="condition-status" class="slider-status">Average condition</span>
+            <span id="condition-pct" class="slider-pct" style="letter-spacing: 1px;">████████░░░░░░░░ 50%</span>
+          </div>
+          <input type="range" id="condition-slider" name="condition" min="0" max="100" value="50" class="condition-slider">
+          <div class="slider-ticks">
+            <span>0% (Critical)</span>
+            <span>25% (Poor)</span>
+            <span>50% (Average)</span>
+            <span>75% (Good)</span>
+            <span>100% (Excellent)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Owner Care -->
+      <div class="field-group form-full-width">
+        <label class="field-label">
+          <span>4. Owner Care & Preservation</span>
+          <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted);">RESPONSIBILITY LEVEL</span>
+        </label>
+        <div class="segmented-grid five-cols">
+          <label class="segmented-label">
+            <input type="radio" name="care" value="Excellent">
+            <span class="segmented-text">Excellent</span>
+          </label>
+          <label class="segmented-label active">
+            <input type="radio" name="care" value="Good" checked>
+            <span class="segmented-text">Good</span>
+          </label>
+          <label class="segmented-label">
+            <input type="radio" name="care" value="Questionable">
+            <span class="segmented-text">Questionable</span>
+          </label>
+          <label class="segmented-label">
+            <input type="radio" name="care" value="Negligent">
+            <span class="segmented-text">Negligent</span>
+          </label>
+          <label class="segmented-label">
+            <input type="radio" name="care" value="I forgot this object existed">
+            <span class="segmented-text">Forgotten</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- 5. Optional Notes -->
+      <div class="field-group form-full-width">
+        <label class="field-label" for="notes-field">
+          <span>5. Circumstantial Evidence / Sworn Testimony</span>
+          <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted);">OPTIONAL</span>
+        </label>
+        <textarea id="notes-field" name="notes" rows="3" class="form-control" placeholder="Describe the object's current trauma, habits, or close calls (e.g. 'Used relentlessly during calculus revision, dropped twice on tile')"></textarea>
+      </div>
+
+      <!-- 3. LIVE RISK PREVIEW BOX -->
+      <div class="form-full-width">
+        <div id="live-risk-card" class="live-risk-card safe">
+          <div class="live-risk-header">
+            <div class="live-risk-title">CURRENT RISK (ESTIMATED PREVIEW)</div>
+            <div class="live-risk-disclaimer">Preview only · Final calculated by Flask</div>
+          </div>
+          <div class="live-risk-body">
+            <div id="live-risk-badge" class="live-risk-badge">🟢 SAFE</div>
+            <div class="live-risk-prob-text">Estimated survival: <span id="live-survival-pct" style="font-weight: 700; color: #fff;">84%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. DEMO MODE TOGGLE (HACKATHON JUDGING ACCELERATOR) -->
+      <div class="form-full-width">
+        <div class="demo-mode-container" style="background: rgba(217, 4, 41, 0.08); border: 1px dashed rgba(217, 4, 41, 0.4); border-radius: 8px; padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+              <span style="font-family: var(--font-display); font-size: 0.9375rem; font-weight: 700; color: #fff; letter-spacing: 0.05em;">
+                ☠️ DEMO MODE
+              </span>
+              <span style="background: rgba(217, 4, 41, 0.2); color: #ff8598; font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 4px; border: 1px solid rgba(217, 4, 41, 0.3);">
+                HACKATHON EVALUATION
+              </span>
+            </div>
+            <div style="font-size: 0.8125rem; color: #a1a1aa; line-height: 1.4;">
+              Convert remaining lifetime into a live <strong>02:30</strong> countdown to watch the object expire in real-time.
+            </div>
+          </div>
+          
+          <label style="position: relative; display: inline-flex; align-items: center; cursor: pointer; user-select: none;">
+            <input type="checkbox" name="demo_mode" id="demo-mode-toggle" value="on" style="display: none;">
+            <div id="demo-toggle-pill" style="width: 56px; height: 30px; background: #262635; border: 1px solid var(--border); border-radius: 9999px; position: relative; transition: background 0.2s, border-color 0.2s;">
+              <div id="demo-toggle-thumb" style="width: 22px; height: 22px; background: #8e8e9f; border-radius: 50%; position: absolute; top: 3px; left: 4px; transition: transform 0.2s, background 0.2s;"></div>
+            </div>
+            <span id="demo-toggle-label" style="margin-left: 0.75rem; font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 700; color: #8e8e9f; min-width: 32px;">OFF</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="form-full-width" style="margin-top: 1rem;">
+        <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 1.125rem; font-size: 1.125rem;">
+          <span>☠</span>
+          <span>BEGIN ANALYSIS</span>
+        </button>
+      </div>
+    </div>
+  </form>
+</section>
+
+<!-- Recent Autopsy Archives -->
+{% if recent_cases %}
+<section style="margin-bottom: 3rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+    <h3 style="font-family: var(--font-display); font-size: 1.25rem;">RECENT AUTOPSY FILES</h3>
+    <a href="{{ url_for('history') }}" style="color: var(--danger); font-family: var(--font-mono); font-size: 0.8125rem; text-decoration: none;">View All Archives &rarr;</a>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+    {% for c in recent_cases %}
+    <div style="background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between;">
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted);">CASE #{{ c.case_id }}</span>
+          <span style="font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; color: {% if c.risk == 'TERMINAL' %}var(--terminal){% elif c.risk == 'CRITICAL' %}var(--critical){% elif c.risk == 'AT RISK' %}var(--warning){% else %}var(--safe){% endif %};">
+            {{ c.risk }}
+          </span>
+        </div>
+        <div style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.25rem;">
+          {{ c.icon }} {{ c.object_name }}
+        </div>
+        <p style="font-size: 0.8125rem; color: var(--muted); margin-bottom: 1rem;">
+          Life remaining: {{ c.remaining_formatted }} · {{ c.survival_probability }}% Survival
+        </p>
+      </div>
+      <a href="{{ url_for('result', case_id=c.case_id) }}" class="btn-secondary" style="justify-content: center; font-size: 0.75rem; padding: 0.5rem;">
+        View Report
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- 4. ADVANCED ANALYSIS ANIMATION SEQUENCE MODAL -->
+<div id="analysis-modal" class="modal-overlay">
+  <div class="modal-box forensic-terminal">
+    <div class="terminal-header">
+      <span class="terminal-title">☠️ MORTEM FORENSIC ENGINE</span>
+      <span class="terminal-status">PROCESSING</span>
+    </div>
+    <div class="terminal-engine-name">MORTEM ENGINE INITIALIZING...</div>
+    <div class="terminal-progress-bar" id="terminal-bar">[░░░░░░░░░░░░░░░░]</div>
+    <div class="terminal-steps" id="terminal-steps-list">
+      <div class="step-item" id="step-0"><span class="step-name">IDENTIFYING OBJECT...</span> <span class="step-check"></span></div>
+      <div class="step-item" id="step-1"><span class="step-name">ANALYZING CONDITION...</span> <span class="step-check"></span></div>
+      <div class="step-item" id="step-2"><span class="step-name">CALCULATING USAGE DAMAGE...</span> <span class="step-check"></span></div>
+      <div class="step-item" id="step-3"><span class="step-name">EVALUATING OWNER CARE...</span> <span class="step-check"></span></div>
+      <div class="step-item" id="step-4"><span class="step-name">CALCULATING LIFESPAN...</span> <span class="step-check"></span></div>
+      <div class="step-item" id="step-5"><span class="step-name">DETERMINING RISK...</span> <span class="step-check"></span></div>
+      <div class="step-item" id="step-6"><span class="step-name">SEARCHING FOR CAUSE OF DEATH...</span> <span class="step-check"></span></div>
+      <div class="step-item" id="step-7"><span class="step-name">FINALIZING REPORT...</span> <span class="step-check"></span></div>
+    </div>
+  </div>
+</div>
+{% endblock %}

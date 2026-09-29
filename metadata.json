@@ -1,0 +1,6 @@
+{
+  "name": "MORTEM: The Unnecessarily Serious Object Lifespan Predictor ☠️",
+  "description": "A dark forensic laboratory web application that dramatically predicts the remaining lifespan, survival probability, and inevitable cause of death of everyday objects.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,288 @@
+{
+  "pencil": {
+    "name": "Pencil",
+    "icon": "✏️",
+    "base_lifespan_days": 30,
+    "fragility": 0.7,
+    "recommended_action": "Purchase replacement immediately. Cease aggressive sharpening.",
+    "last_known_words": "“Bro... I’m already short.”",
+    "margin_note": "Another victim of academic pressure... ☹",
+    "closing_doodle": "Short life. Big dreams.",
+    "forensic_notes": [
+      "Showed signs of wear and tear from excessive use.",
+      "Poor care contributed to accelerated decline.",
+      "Multiple sharpening incidents recorded.",
+      "Final moments were short... just like its length."
+    ],
+    "causes": [
+      "Excessive sharpening during exam preparation.",
+      "Being reduced to molecular dimensions.",
+      "Aggressive eraser usage resulting in decapitation.",
+      "Unexpected snapping under academic pressure."
+    ]
+  },
+  "eraser": {
+    "name": "Eraser",
+    "icon": "🧽",
+    "base_lifespan_days": 60,
+    "fragility": 0.65,
+    "recommended_action": "Accept past mistakes without rubbing holes through reality.",
+    "last_known_words": "“I rubbed away your mistakes, but who will rub away my pain?”",
+    "margin_note": "Erased from existence too soon... 🧽",
+    "closing_doodle": "Gone to dust. Never forgotten.",
+    "forensic_notes": [
+      "Severe loss of bodily mass due to aggressive friction.",
+      "Puncture wounds consistent with 0.7mm mechanical pencil lead.",
+      "Fragmented along structural cleavage plane.",
+      "Died so that bad algebra might be forgiven."
+    ],
+    "causes": [
+      "Furious erasure of catastrophic calculus errors.",
+      "Perforated to death by bored lead pencil stabbings during lectures.",
+      "Splitting into three uneven fragments along a stress fracture.",
+      "Dissolving into crumbly gray dust on an exam paper."
+    ]
+  },
+  "charger": {
+    "name": "Charger Cable",
+    "icon": "🔌",
+    "base_lifespan_days": 180,
+    "fragility": 0.85,
+    "recommended_action": "Stop bending the cable at impossible angles.",
+    "last_known_words": "“If you bend me 43 degrees to the left, I might still spark...”",
+    "margin_note": "One angle only until the end... 🔌",
+    "closing_doodle": "Tangled forever in our hearts.",
+    "forensic_notes": [
+      "Terminal stress fractures detected near the connector neck.",
+      "Copper wiring exposed to standard room elements.",
+      "Victim of frequent violent unpluggings across the bedroom.",
+      "Admitted in critical tape-bound condition."
+    ],
+    "causes": [
+      "Chronic one-angle-only syndrome near the connector neck.",
+      "Violent yank from the wall socket from across the bedroom.",
+      "Internal copper rupture caused by violent backpack knotting.",
+      "Mysterious 3 AM feline gnawing assault."
+    ]
+  },
+  "mug": {
+    "name": "Coffee Mug",
+    "icon": "☕",
+    "base_lifespan_days": 730,
+    "fragility": 0.5,
+    "recommended_action": "Relocate at least 15cm away from desk edges and elbows.",
+    "last_known_words": "“I was only two days from retirement on the top shelf...”",
+    "margin_note": "Shattered before its first sip... ☕",
+    "closing_doodle": "May your refills be eternal.",
+    "forensic_notes": [
+      "Ceramic blunt force trauma consistent with Monday morning tile collision.",
+      "Handle amputated during rapid gesture in Zoom call.",
+      "Severe coffee tannin staining indicates heavy operational fatigue.",
+      "Glue reconstruction deemed medically futile."
+    ],
+    "causes": [
+      "Catastrophic impact event caused by Monday morning uncoordination.",
+      "Thermal shock induced by hasty microwave-to-cold-sink carelessness.",
+      "Lethal handle detachment during critical coffee payload transit.",
+      "Knocked off desk corner by an overenthusiastic gesture during a Zoom call."
+    ]
+  },
+  "sock": {
+    "name": "Favorite Sock",
+    "icon": "🧦",
+    "base_lifespan_days": 120,
+    "fragility": 0.6,
+    "recommended_action": "Begin partner recovery operations behind the washing machine.",
+    "last_known_words": "“Tell my partner in the dryer... I never stopped looking for them.”",
+    "margin_note": "Lost in the laundry vortex... 🧦",
+    "closing_doodle": "A sole without a mate.",
+    "forensic_notes": [
+      "Lethal toe breach through fragile bottom yarn mesh.",
+      "Elastic tension completely flatlined; no rebound detected.",
+      "Survived 48 hostile washing machine spin cycles.",
+      "Single sock status resulted in profound psychological grief."
+    ],
+    "causes": [
+      "Permanent separation from its partner in the washer-dryer wormhole.",
+      "Big toe breach through thin heel fabric during sudden sprints to the kitchen.",
+      "Elastic tissue death resulting in perpetual humiliating ankle bunching.",
+      "Devoured by the interdimensional laundry void."
+    ]
+  },
+  "shoes": {
+    "name": "Everyday Sneakers",
+    "icon": "👟",
+    "base_lifespan_days": 365,
+    "fragility": 0.4,
+    "recommended_action": "Untie before kicking off your feet, barbarian.",
+    "last_known_words": "“You never once untied my laces before shoving your foot in...”",
+    "margin_note": "Walked its final mile... 👟",
+    "closing_doodle": "Tread softly, dear friend.",
+    "forensic_notes": [
+      "Sole flapping rhythmically during standard hallway transit.",
+      "Heel counter pulverized into structural mush.",
+      "Tread depth zero; hydroplane hazard on polished supermarket floors.",
+      "Subject walked 10,000 steps a day towards its own demise."
+    ],
+    "causes": [
+      "Sole separation resulting in loud, rhythmic shoe-flapping down the hallway.",
+      "Tread erosion leading to total hydroplaning on slick supermarket tiles.",
+      "Heel counter pulverized by refusing to untie laces before shoving feet inside.",
+      "Rain puddle submersion resulting in irreversible swamp ecosystem."
+    ]
+  },
+  "earphones": {
+    "name": "Earphones",
+    "icon": "🎧",
+    "base_lifespan_days": 240,
+    "fragility": 0.8,
+    "recommended_action": "Clean the charging contacts and desist pocket tangles.",
+    "last_known_words": "“My left ear is already in heaven... the right one won’t last long.”",
+    "margin_note": "Silence has fallen... 🎧",
+    "closing_doodle": "The playlist has ended.",
+    "forensic_notes": [
+      "Severe volume imbalance; left driver output down to 9%.",
+      "Lithium cell battery capacity holds charge for approximately 3 minutes.",
+      "Surviving memory of a 40-minute heavy wash cycle in jeans.",
+      "Pocket knot topology exceeded Euclidean dimensions."
+    ],
+    "causes": [
+      "Left audio driver permanently dropping to 12% volume.",
+      "Left behind in an airport security bin or passenger seat pocket.",
+      "Surviving a 40-minute heavy wash cycle inside denim jeans.",
+      "Lithium battery degradation capping battery life to 3 minutes and 40 seconds."
+    ]
+  },
+  "toothbrush": {
+    "name": "Toothbrush",
+    "icon": "🪥",
+    "base_lifespan_days": 90,
+    "fragility": 0.75,
+    "recommended_action": "Brush with circular technique, not aggressive jackhammer force.",
+    "last_known_words": "“Why did you scrub like you were cleaning engine parts?”",
+    "margin_note": "Fought plaque to the death... 🪥",
+    "closing_doodle": "Keep smiling, wherever you are.",
+    "forensic_notes": [
+      "Bristles splayed outward in trauma resembling a deep-sea creature.",
+      "Exceeded official hygienic lifespan by four consecutive quarters.",
+      "Subject dropped twice behind the bathroom mirror cabinet.",
+      "Enamel friction exceeded recommended aerospace tolerances."
+    ],
+    "causes": [
+      "Failure to survive excessive dental enthusiasm and aggressive jaw friction.",
+      "Bristles splayed into a traumatized sea anemone shape.",
+      "Plummeting into the unreachable abyss behind the bathroom mirror cabinet.",
+      "Exceeded official dental hygiene expiration by four calendar seasons."
+    ]
+  },
+  "phone_screen": {
+    "name": "Phone Screen",
+    "icon": "📱",
+    "base_lifespan_days": 500,
+    "fragility": 0.9,
+    "recommended_action": "Invest in a tempered glass screen protector and non-butter fingers.",
+    "last_known_words": "“I saw the bathroom tile rushing towards me in slow motion...”",
+    "margin_note": "Cracked under terrestrial pressure... 📱",
+    "closing_doodle": "No more blue light.",
+    "forensic_notes": [
+      "Spiderweb glass fractures spanning 94% of the capacitive surface.",
+      "Ghost touches registering spontaneous texts to ex-partners.",
+      "Display bleeding purple OLED ink across the notification bar.",
+      "Refusal to wear tempered glass armor proved fatal."
+    ],
+    "causes": [
+      "Repeated exposure to gravity on unforgiving concrete sidewalks.",
+      "Lethal pocket confrontation with heavy brass apartment keys.",
+      "Face-down drop on the tile floor during 2 AM horizontal scrolling.",
+      "Hairline crack spiderwebbing into an illegible mosaic of fractured glass."
+    ]
+  },
+  "chair": {
+    "name": "Desk Chair",
+    "icon": "🪑",
+    "base_lifespan_days": 1095,
+    "fragility": 0.3,
+    "recommended_action": "Tighten hex bolts and stop leaning back past 45 degrees.",
+    "last_known_words": "“Please stop leaning back past 45 degrees, I’m begging you...”",
+    "margin_note": "Held the weight of your deadlines... 🪑",
+    "closing_doodle": "Rest easy, stalwart seat.",
+    "forensic_notes": [
+      "Hydraulic cylinder failure causing slow, humiliating sinking during meetings.",
+      "Caster wheels completely immobilized by accumulated hair and carpet lint.",
+      "Armrest cushion permanently crushed into a geological depression.",
+      "Lumbar support plastic fractured under gaming tilt stress."
+    ],
+    "causes": [
+      "Hydraulic cylinder failure causing slow, humiliating sinking during meetings.",
+      "Structural lumbar crack during prolonged dramatic gaming tilts.",
+      "Caster wheels completely immobilized by accumulated hair and carpet lint.",
+      "Armrest cushion permanently crushed into a geological depression."
+    ]
+  },
+  "water_bottle": {
+    "name": "Water Bottle",
+    "icon": "🧊",
+    "base_lifespan_days": 730,
+    "fragility": 0.4,
+    "recommended_action": "Hand wash rubber gaskets to avoid bio-hazard mold colonies.",
+    "last_known_words": "“That bottom dent makes me wobble whenever you put me down...”",
+    "margin_note": "Quenched its last thirst... 🧊",
+    "closing_doodle": "Stay hydrated on the other side.",
+    "forensic_notes": [
+      "Concave base trauma prevents upright orientation on flat tables.",
+      "Black mold gasket civilization advancing to industrial-era technology.",
+      "Left behind under gym benches and library desks, yet returned.",
+      "Cap thread stripping leading to insidious backpack book-flooding."
+    ],
+    "causes": [
+      "Severe bottom dent preventing the vessel from standing upright without tipping.",
+      "Black mold gasket civilization advancing to industrial-era technology.",
+      "Abandoned under a gym weight bench or library desk forever.",
+      "Lid thread stripping leading to insidious backpack book-flooding."
+    ]
+  },
+  "backpack": {
+    "name": "Backpack",
+    "icon": "🎒",
+    "base_lifespan_days": 900,
+    "fragility": 0.35,
+    "recommended_action": "Cease transporting three heavy textbooks and an unsealed shake.",
+    "last_known_words": "“You didn’t need to pack three giant textbooks AND a hoodie...”",
+    "margin_note": "Carried your burdens until the end... 🎒",
+    "closing_doodle": "Unburdened at last.",
+    "forensic_notes": [
+      "Main zipper teeth rupture caused by packing unreasonable volumes.",
+      "Right shoulder strap thread giving up at 8:55 AM on campus.",
+      "Gel pen cap loss resulting in permanent ink hemorrhage inside.",
+      "Bottom fabric abrasion resulting in spontaneous laptop exit."
+    ],
+    "causes": [
+      "Main zipper teeth rupture caused by packing three oversized textbooks and a hoodie.",
+      "Right shoulder strap thread giving up at 8:55 AM on campus.",
+      "Gel pen cap loss resulting in permanent ink hemorrhage in bottom compartment.",
+      "Bottom fabric wear-through resulting in spontaneous laptop ejection."
+    ]
+  },
+  "custom": {
+    "name": "Custom Subject",
+    "icon": "☠️",
+    "base_lifespan_days": 180,
+    "fragility": 0.7,
+    "recommended_action": "Treat with immediate reverence before entropy claims it.",
+    "last_known_words": "“I did my best in an uncaring universe.”",
+    "margin_note": "Another victim of entropy... ☠️",
+    "closing_doodle": "Rest in peace, brave object.",
+    "forensic_notes": [
+      "Physical integrity compromised by standard terrestrial physics.",
+      "Material fatigue outpaced owner maintenance protocols.",
+      "Exhibited dramatic signs of terminal existential decline.",
+      "Entropy claimed another faithful everyday companion."
+    ],
+    "causes": [
+      "Mysterious structural decay under the harsh laws of physics.",
+      "Neglect in the bottom drawer of forgotten relics.",
+      "Sudden catastrophic failure during the moment it was needed most.",
+      "Accelerated entropy induced by owner indifference."
+    ]
+  }
+}

@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}CASE ARCHIVES · MORTEM HISTORICAL REGISTRY{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
+  <div>
+    <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.25rem;">
+      OFFICIAL AUTOPSY LOGS
+    </div>
+    <h1 style="font-family: var(--font-display); font-size: 2.25rem; font-weight: 700;">CASE ARCHIVES</h1>
+  </div>
+
+  <div style="display: flex; gap: 0.75rem;">
+    {% if predictions %}
+    <form method="POST" action="{{ url_for('clear_history') }}" onsubmit="return confirmClearHistory(event)">
+      <button type="submit" class="btn-secondary" style="color: #ff5c75; border-color: rgba(255, 92, 117, 0.3);">
+        🗑️ Purge Archive
+      </button>
+    </form>
+    {% endif %}
+    <a href="{{ url_for('home') }}#autopsy-section" class="btn-primary">
+      <span>☠</span>
+      <span>New Autopsy</span>
+    </a>
+  </div>
+</div>
+
+<!-- Archives Telemetry -->
+<div class="stats-grid" style="margin-bottom: 2.5rem;">
+  <div class="stat-box">
+    <div class="stat-label">Total Objects Analyzed</div>
+    <div class="stat-value">{{ stats.total_analyzed }}</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-label">Safe Objects</div>
+    <div class="stat-value safe">{{ stats.safe_objects }}</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-label">At Risk Objects</div>
+    <div class="stat-value warning">{{ stats.at_risk_objects }}</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-label">Critical Cases</div>
+    <div class="stat-value critical">{{ stats.critical_cases }}</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-label">Terminal Cases</div>
+    <div class="stat-value danger">{{ stats.terminal_cases }}</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-label">Average Survival</div>
+    <div class="stat-value">{{ stats.average_survival }}%</div>
+  </div>
+</div>
+
+{% if predictions %}
+<div class="history-table-wrap">
+  <table class="history-table">
+    <thead>
+      <tr>
+        <th>Case File</th>
+        <th>Date & Time</th>
+        <th>Subject</th>
+        <th>Condition</th>
+        <th>Risk Level</th>
+        <th>Remaining Life</th>
+        <th>Survival %</th>
+        <th style="text-align: right;">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in predictions %}
+      <tr>
+        <td style="font-family: var(--font-mono); font-weight: 700; color: #fff;">
+          #{{ p.case_id }}
+        </td>
+        <td style="font-family: var(--font-mono); color: var(--muted); font-size: 0.8125rem;">
+          {{ p.timestamp }}
+        </td>
+        <td style="font-weight: 600;">
+          {{ p.icon }} {{ p.object_name }}
+        </td>
+        <td>
+          {{ p.condition }}%
+        </td>
+        <td>
+          <span style="font-family: var(--font-mono); font-weight: 700; font-size: 0.8125rem; color: {% if p.risk == 'TERMINAL' %}var(--terminal){% elif p.risk == 'CRITICAL' %}var(--critical){% elif p.risk == 'AT RISK' %}var(--warning){% else %}var(--safe){% endif %};">
+            {{ p.risk }}
+          </span>
+        </td>
+        <td style="font-family: var(--font-mono);">
+          {{ p.remaining_formatted }}
+        </td>
+        <td style="font-family: var(--font-mono); font-weight: 600;">
+          {{ p.survival_probability }}%
+        </td>
+        <td style="text-align: right;">
+          <a href="{{ url_for('result', case_id=p.case_id) }}" class="btn-secondary" style="font-size: 0.75rem; padding: 0.35rem 0.75rem;">
+            View Dossier
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div style="background: var(--panel); border: 1px dashed var(--border); border-radius: 12px; padding: 4rem 2rem; text-align: center;">
+  <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
+  <h3 style="font-family: var(--font-display); font-size: 1.5rem; margin-bottom: 0.5rem;">NO AUTOPSIES ON FILE</h3>
+  <p style="color: var(--muted); max-width: 480px; margin: 0 auto 2rem auto;">
+    The archives are pristine. No innocent everyday objects have yet been officially condemned.
+  </p>
+  <a href="{{ url_for('home') }}#autopsy-section" class="btn-primary">
+    <span>☠</span>
+    <span>Perform First Autopsy</span>
+  </a>
+</div>
+{% endif %}
+{% endblock %}
